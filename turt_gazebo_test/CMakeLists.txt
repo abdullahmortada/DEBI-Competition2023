@@ -2,7 +2,7 @@
 # Set minimum required version of cmake, project name and compile options
 ################################################################################
 cmake_minimum_required(VERSION 2.8.3)
-project(turtlebot3_manipulation_gazebo)
+project(turt_gazebo_test)
 
 add_compile_options(-std=c++11)
 
