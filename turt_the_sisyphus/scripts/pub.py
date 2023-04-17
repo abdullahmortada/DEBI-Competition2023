@@ -2,18 +2,18 @@ import rospy
 from geometry_msgs.msg import Point, Twist
 from std_msgs.msg import Bool
 
-move_list = [Point(1.1, 0, 0), 
-             Point(0, 0.96, 0), Point(1.1, 0.96, 1), 
-             Point(0, -0.92, 0), Point(1.1, -0.92, 0)]
+move_list = [Point(1.155, 0, 0), 
+             Point(0, 0.968, 0), Point(1.155, 0.979, 1), 
+             Point(0, -0.91, 0), Point(1.155, -0.91, 0)]
 
 def reverse(data):
     if data.data:
         if len(move_list) % 2 == 0:
             cmd = Twist()
             cmd.linear.x = -0.2
-            cmd.angular.z = 0.8
+            # cmd.angular.z = 0.8
             cmd_vel.publish(cmd)
-            rospy.sleep(1)
+            rospy.sleep(0.5)
         if move_list:
             pub.publish(move_list[0])
     else:

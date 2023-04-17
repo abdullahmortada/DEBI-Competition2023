@@ -8,6 +8,7 @@ import numpy as np
 
 
 def Callback(data):
+    print("starting at ", data)
     def get_odom(tf_listener, odom_frame, base_frame):
         try:
             (trans, rot) = tf_listener.lookupTransform(odom_frame, base_frame, rospy.Time(0))
@@ -20,7 +21,7 @@ def Callback(data):
         return (Point(*trans), rotation[2])
 
     move_cmd = Twist()
-    rate = rospy.Rate(10)
+    rate = rospy.Rate(20)
     tf_listener = tf.TransformListener()
     odom_frame = 'odom' 
     is_ready.publish(Bool(False))
@@ -44,6 +45,32 @@ def Callback(data):
     angular_speed = 1
     (goal_x, goal_y, goal_z) = (data.x, data.y, data.z)
     goal_z = np.deg2rad(goal_z)
+    goal_angle = atan2(goal_y - position.y, goal_x - position.x)
+    print("goal angle:", goal_angle)
+    
+
+    while abs(rotation - goal_angle) > 0.05:
+        (position, rotation) = get_odom(tf_listener, odom_frame, base_frame)
+        x_start = position.x
+        y_start = position.y
+        if goal_angle >= 0:
+            if rotation <= goal_angle and rotation >= goal_angle - pi:
+                move_cmd.linear.x = 0.00
+                move_cmd.angular.z = 0.5
+            else:
+                move_cmd.linear.x = 0.00
+                move_cmd.angular.z = -0.5
+        else:
+            if rotation <= goal_angle + pi and rotation > goal_angle:
+                move_cmd.linear.x = 0.00
+                move_cmd.angular.z = -0.5
+            else:
+                move_cmd.linear.x = 0.00
+                move_cmd.angular.z = 0.5
+        cmd_vel.publish(move_cmd)
+        rate.sleep()
+
+
     goal_distance = sqrt(pow(goal_x - position.x, 2) + pow(goal_y - position.y, 2))
     distance = goal_distance
 
