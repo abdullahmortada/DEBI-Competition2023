@@ -1,6 +1,10 @@
 Follow the steps in this link:
-https://emanual.robotis.com/docs/en/platform/turtlebot3/manipulation/#software-setup
-to install openmanipulator dependencies 
+
+  https://emanual.robotis.com/docs/en/platform/turtlebot3/quick-start/#pc-setup
+  to install ros noetic and turtlebot3 dependencies
+
+  https://emanual.robotis.com/docs/en/platform/turtlebot3/manipulation/#software-setup
+  to install openmanipulator dependencies 
 
 Place the unzipped package in catkin_ws/src directory and catkin_make it.
 Two methods to run the simulation:
