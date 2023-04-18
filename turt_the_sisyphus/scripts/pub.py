@@ -3,12 +3,13 @@ from geometry_msgs.msg import Point, Twist
 from std_msgs.msg import Bool
 
 move_list = [Point(1.155, 0, 0), 
-             Point(0, 0.968, 0), Point(1.155, 0.979, 1), 
-             Point(0, -0.91, 0), Point(1.155, -0.91, 0)]
+             Point(0, 0.97, 0), Point(1.155, 0.97, 1), 
+             Point(0, -0.91, 0), Point(1.155, -0.91, 0),
+             Point(0, 0, 0)]
 
 def reverse(data):
     if data.data:
-        if len(move_list) % 2 == 0:
+        if len(move_list) % 2 != 0:
             cmd = Twist()
             cmd.linear.x = -0.2
             # cmd.angular.z = 0.8

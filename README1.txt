@@ -1,13 +1,19 @@
-To run the simulation, place the package folder in your catkin_ws/src directory and catkin_make it.
-Run:
+Place the unzipped package in catkin_ws/src directory and catkin_make it.
+Two methods to run the simulation:
+  1)Premade .launch file:
+  just run: 
+  
+      roslaunch turt_the_sisyphus turt_the_sisyphus.launch
 
-    roslaunch turt_gazebo_test debi_map.launch
+  2) run the separate nodes:
+  Run:
 
-This launches the gazebo simulation. Unpause it, then:
+      roslaunch turt_gazebo_test debi_map.launch
 
-    rosrun turt_the_sisyphus movement.py 
+  This launches the gazebo simulation. Unpause it, then:
 
-This starts the movement node. 
-Finally to run the publisher node run: 
+      rosrun turt_the_sisyphus movement.py 
 
-    rosrun turt_the_sisyphus pub.py
+  Finally to run the publisher node run: 
+
+      rosrun turt_the_sisyphus pub.py

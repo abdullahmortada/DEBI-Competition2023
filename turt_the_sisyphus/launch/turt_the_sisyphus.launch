@@ -1,0 +1,5 @@
+<launch>
+  <include file="$(find turt_gazebo_test)/launch/debi_map.launch"></include>
+  <node name="movement_node" pkg="turt_the_sisyphus" type="movement.py" output="screen"/>
+  <node name="pub_node" pkg="turt_the_sisyphus" type="pub.py" output="screen"/>
+</launch>
