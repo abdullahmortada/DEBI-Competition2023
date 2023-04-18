@@ -2,7 +2,7 @@ xhost local:root
 XAUTH=/tmp/.docker.xauth 
 
 docker run -it \
-  --name=turt --env="DISPLAY=$DISPLAY" \
+  --name=turt2 --env="DISPLAY=$DISPLAY" \
   --env="QT_X11_NO_MITSHM=1" \
   --env="XAUTHORITY=$XAUTH" \
   --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
