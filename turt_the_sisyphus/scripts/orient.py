@@ -1,14 +1,8 @@
 #!/usr/bin/env python3
 import rospy
-import cv2
-import numpy as np
-from cv_bridge import CvBridge 
 
 from geometry_msgs.msg import Twist
 from geometry_msgs.msg import Point
-from std_msgs.msg import String
-from sensor_msgs.msg import CompressedImage
-import time
 
 # Callback function called whenever
 # x-y coordinate received
@@ -40,7 +34,6 @@ def drive_callback(data):
 		if abs(norm_x) < 0.15:
 			print ("delX: {:.3f}. Stay in center".format(norm_x))
 			vel.angular.z = 0
-            if 
 	# publish vel on the publisher
 	pub_vel.publish(vel)
 
