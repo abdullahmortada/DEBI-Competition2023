@@ -1,13 +1,10 @@
 #!/usr/bin/env python3
 import rospy
 import cv2
-import numpy as np
 from cv_bridge import CvBridge 
 import imutils
 
-from geometry_msgs.msg import Twist
 from geometry_msgs.msg import Point
-from std_msgs.msg import String
 from std_msgs.msg import Float32
 from sensor_msgs.msg import CompressedImage
 
@@ -76,7 +73,7 @@ def image_callback(data):
 
 	# convert to numpy -> RGB
 	image = bridge.compressed_imgmsg_to_cv2(data, "bgr8")
-	h , w = image.shape[:2]
+	_ , w = image.shape[:2]
 
 	# image = imutils.resize(image, width=int(w*8))
 	cX, cY, mask, cArea = detectBall(image)

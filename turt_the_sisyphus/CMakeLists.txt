@@ -159,6 +159,9 @@ catkin_install_python(PROGRAMS
     scripts/movement.py
     scripts/pub.py
     scripts/moveit.py
+    scripts/orient.py 
+    scripts/detect_ball.py 
+    scripts/forward_pub.py 
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
