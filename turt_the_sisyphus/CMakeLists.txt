@@ -158,6 +158,7 @@ include_directories(
 catkin_install_python(PROGRAMS
     scripts/movement.py
     scripts/pub.py
+    scripts/moveit.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

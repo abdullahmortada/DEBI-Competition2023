@@ -3,7 +3,7 @@ gripper_controller:
   joints:
     - gripper
   constraints:
-      goal_time: 0.6
+      goal_time: 1
       stopped_velocity_tolerance: 0.05
       gripper: {trajectory: 0.1, goal: 0.1}
   stop_trajectory_duration: 0.5
