@@ -17,7 +17,7 @@ def drive_callback(data):
 
     # 
     if ball_x < 0 and ball_y < 0:
-        vel.angular.z = 0
+        pass
     else:
         # Determine center-x, normalized deviation from center
         mid_x  	= int(width/2)
@@ -32,13 +32,8 @@ def drive_callback(data):
             vel.angular.z = 0.5
         if abs(norm_x) < 0.1:
             print ("delX: {:.3f}. Stay in center".format(norm_x))
-            vel.angular.z = 0
     # publish vel on the publisher
     pub_vel.publish(vel)
-
-
-def dist_callback(data):
-    print("Distance: ", data.data)
 
 
 if __name__ == '__main__':
@@ -49,7 +44,6 @@ if __name__ == '__main__':
 
     # subscribe to /ball_location topic to receive coordinates
     img_sub = rospy.Subscriber("/ball_location",Point, drive_callback)
-    dist_sub = rospy.Subscriber("/ball_dist", Float32, dist_callback)
 
     # publish to /cmd_vel topic the angular-z velocity change
     pub_vel = rospy.Publisher('/cmd_vel', Twist, queue_size=5)

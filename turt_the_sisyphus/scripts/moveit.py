@@ -1,21 +1,13 @@
 import sys
-import copy
 import rospy
 import moveit_commander 
 import geometry_msgs.msg
+from std_msgs.msg import Point, Bool
+# import copy
 # import moveit_msgs.msg 
-# from std_msgs.msg import String 
-# from moveit_commander.conversions import pose_to_list 
 # from math import tau
 
 
-moveit_commander.roscpp_initialize(sys.argv)
-rospy.init_node("moveit", anonymous=True)
-robot = moveit_commander.RobotCommander()
-scene = moveit_commander.PlanningSceneInterface()
-
-move_group = moveit_commander.MoveGroupCommander("arm")
-gripper_group = moveit_commander.MoveGroupCommander("gripper")
 
 def openGripper():
     grip_goal = gripper_group.get_current_joint_values()
@@ -49,38 +41,50 @@ def goToPose(pose):
 
 
 def goCartesian(poseList):
-    (plan, _) = move_group.compute_cartesian_path(
+    move_group.set_goal_tolerance(0.02)
+    (plan, fraction) = move_group.compute_cartesian_path(
             poseList, 0.01, 0.0
             )
+    print(fraction)
     move_group.execute(plan, wait=True)
-    move_group.stop()
+    # move_group.stop()
 
 
-ballpos = [0.9, 0.014, 0.027]
-robpos = [0.72, 0.01, 0]
+def ballCallback(data):
+    if data.data > 0.3:
+        return 
 
-# display_trajectory_publisher = rospy.Publisher(
-#     "/move_group/display_planned_path",
-#     moveit_msgs.msg.DisplayTrajectory,
-#     queue_size=20,
-# )
-# rospy.sleep(1)
-goToAngle([0,0,0,0])
+    openGripper()
 
-# openGripper()
-pose_goal = geometry_msgs.msg.Pose()
-pose_goal.orientation.w = 1.0
-pose_goal.position.x = ballpos[0] - robpos[0]
-pose_goal.position.y = ballpos[1] - robpos[1]
-pose_goal.position.z = 0.15
-goToPose(pose_goal)
+    pose_goal = geometry_msgs.msg.Pose()
+    pose_goal.orientation.w = 1.0
+    pose_goal.position.x = data.x
+    pose_goal.position.y = data.y
+    pose_goal.position.z = 0.1
+
+    closeGripper()
+    goToAngle([0,0,0,0])
+    rate.sleep()
 
 
-wpose = move_group.get_current_pose().pose 
-wpose.position.z -= 0.11
-# wpose.position.x += 0.01
-waypoints = [copy.deepcopy(wpose)]
-goCartesian(waypoints)
+def moveStateCallback(data):
+    global is_moving
+    is_moving = data.data
 
-openGripper()
-goToAngle([0,0,0,0])
+
+if __name__ == "__main__":
+    global is_moving 
+    is_moving = False
+    moveit_commander.roscpp_initialize(sys.argv)
+    rospy.init_node("moveit", anonymous=True)
+    robot = moveit_commander.RobotCommander()
+    scene = moveit_commander.PlanningSceneInterface()
+    rate = rospy.Rate(0.5)
+
+    move_group = moveit_commander.MoveGroupCommander("arm")
+    gripper_group = moveit_commander.MoveGroupCommander("gripper")
+    dist_sub = rospy.Subscriber("/grip_coord", Point, ballCallback)
+    moving_sub = rospy.Subscriber("/is_moving", Bool, moveStateCallback)
+
+    goToAngle([0,0,0,0])
+    rospy.spin()
