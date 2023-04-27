@@ -33,28 +33,90 @@ def inRange(x, y, tolerance):
     return ((x[1] - y[1])**2 + (x[0] - y[0])**2)**0.5 < tolerance
 
 
-def dist_callback(data):
-    if data.z <= -1: 
+def insertGoal(x, y, angle=0):
+    global goals
+    goal = Point()
+    goal.x = x 
+    goal.y = y
+    goal.z = angle
+    goals.append(goal)
+
+
+def distFromBall(position, x, y, dist):
+    global goals 
+    angle = atan2((y - position.y), (x - position.x))
+    x = x - dist*cos(angle)
+    y = y - dist*sin(angle)
+
+    for point in goals:
+        if inRange([x, y], [point.x, point.y], 0.1):
+            return
+
+    insertGoal(x, y, dist)
+
+
+def schizoBozo(ballPos, position):
+    if ballPos[0] < -0.35:
         return
-    global tf_listener, odom_frame, base_frame, ball_positions
+
+    ballPos[1] = max(-1.15, min(1.15, ballPos[1]))
+
+    if (position.x + 0.2) > ballPos[0]:
+        if ballPos[1] > position.y:
+            insertGoal(ballPos[0], ballPos[1] - 0.2)
+        else:
+            insertGoal(ballPos[0], ballPos[1] + 0.2)
+
+    insertGoal(ballPos[0] - 0.2, ballPos[1])
+    insertGoal(ballPos[0], ballPos[1])
+    insertGoal(1, ballPos[1])
+
+
+def dist_callback(data):
+    if data.z <= -1 or abs(data.z) > 0.1: 
+        return
+
+    global tf_listener, odom_frame, base_frame, ball_positions, goals
 
     (position, rotation) = get_odom(tf_listener, odom_frame, base_frame)
 
     ballWorldAngle = data.z + rotation
     xOrd = position.x + data.x * cos(ballWorldAngle)
     
-    if xOrd > 1.5:
+    if xOrd > 1.17:
+        print("ball at", xOrd, " out of half")
         return 
 
     yOrd = position.y + data.x * sin(ballWorldAngle)
 
-    # for i in range(len(ball_positions)):
-    #     if inRange([xOrd, yOrd], ball_positions[i], 0.6):
-    #         ball_positions[i][0] = ball_positions[i][0] + xOrd / 2
-    #         ball_positions[i][1] = ball_positions[i][1] + yOrd / 2
-    #         return
+    for i in range(len(ball_positions)):
+        if inRange([xOrd, yOrd], ball_positions[i][0], 0.1):
+            point = Point()
+            point.x = ball_positions[i][0][0] 
+            point.y = ball_positions[i][0][1]
+            coord_pub.publish(point)
+            if len(ball_positions[i]) > 30: 
+                ball_positions[i] = ball_positions[i][0:1]
+                schizoBozo(ball_positions[i][0], position)
+                print(ball_positions[i][0])
+            ball_positions[i].append([xOrd, yOrd])
+            if len(ball_positions[i]) < 6:
+                return 
+            sum_x = sum_y = 0
+            for j in ball_positions[i]:
+                sum_x += j[0]
+                sum_y += j[1] 
+
+            ball_positions[i][0][0] = sum_x / len(ball_positions[i])
+            ball_positions[i][0][1] = sum_y / len(ball_positions[i])
+            return
+
     print(xOrd, yOrd)
-    # ball_positions.append([xOrd, yOrd])
+    ball_positions.append([[xOrd, yOrd]])
+    point = Point()
+    point.x = xOrd 
+    point.y = yOrd
+    coord_pub.publish(point)
 
 
 

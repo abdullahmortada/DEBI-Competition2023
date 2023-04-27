@@ -2,7 +2,10 @@ import sys
 import rospy
 import moveit_commander 
 import geometry_msgs.msg
-from std_msgs.msg import Point, Bool
+from std_msgs.msg import Bool
+from geometry_msgs.msg import Point
+
+from movement import get_odom, tf_listener, odom_frame, base_frame
 # import copy
 # import moveit_msgs.msg 
 # from math import tau
@@ -51,15 +54,20 @@ def goCartesian(poseList):
 
 
 def ballCallback(data):
-    if data.data > 0.3:
+    if is_moving:
+        return 
+
+    position, _ = get_odom(tf_listener, odom_frame, base_frame) 
+
+    if ((data.x - position.x) ** 2 + (data.y - position.y)**2)**0.5 > 0.3:
         return 
 
     openGripper()
 
     pose_goal = geometry_msgs.msg.Pose()
     pose_goal.orientation.w = 1.0
-    pose_goal.position.x = data.x
-    pose_goal.position.y = data.y
+    pose_goal.position.x = data.x - position.x
+    pose_goal.position.y = data.y - position.y
     pose_goal.position.z = 0.1
 
     closeGripper()
@@ -73,8 +81,9 @@ def moveStateCallback(data):
 
 
 if __name__ == "__main__":
-    global is_moving 
+    global is_moving, has_ball
     is_moving = False
+    has_ball = False
     moveit_commander.roscpp_initialize(sys.argv)
     rospy.init_node("moveit", anonymous=True)
     robot = moveit_commander.RobotCommander()
@@ -83,7 +92,7 @@ if __name__ == "__main__":
 
     move_group = moveit_commander.MoveGroupCommander("arm")
     gripper_group = moveit_commander.MoveGroupCommander("gripper")
-    dist_sub = rospy.Subscriber("/grip_coord", Point, ballCallback)
+    dist_sub = rospy.Subscriber("/ball_coord", Point, ballCallback)
     moving_sub = rospy.Subscriber("/is_moving", Bool, moveStateCallback)
 
     goToAngle([0,0,0,0])

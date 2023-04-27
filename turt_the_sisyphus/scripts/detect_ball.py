@@ -21,7 +21,7 @@ def detectBall(frame):
     # lime-green
     colorLower = ( 25, 50,  0)
     colorUpper = ( 90,255,255)
-    i1, i2 = 2, 5
+    i1, i2 = 1, 1
 
     # blue
     # colorLower = ( 90, 70,100)
@@ -79,15 +79,22 @@ def detectBall(frame):
 def calc_dist(width):
     #(known radius x focal length)/apparent radius
     if width:
-        return (5 * 8.72)/ (width)
+        return (38)/ (width)
     return 0
+
+
+# def calc_dist(diam, img_height):
+#     #(known radius x focal length)/apparent radius
+#     if diam:
+#         return (3.6 * 55 * img_height)/(diam * 2.813 * 1000)
+#     return 0
 
 
 # Callback called whenever image received
 def image_callback(data):
     # convert to numpy -> RGB
     image = bridge.compressed_imgmsg_to_cv2(data, "bgr8")
-    _ , w = image.shape[:2]
+    h , w = image.shape[:2]
 
     # image = imutils.resize(image, width=int(w*8))
     cX, cY, mask, ballWidth = detectBall(image)
@@ -100,12 +107,18 @@ def image_callback(data):
     pub_point.publish(point)	# Publish point on the publisher
 
     angle = -1
+    yAngle = -1
     if cX >= 0: 
         angle = ((cX - int(w/2))/w)*1.0856
-    point = Point()
-    point.x = calc_dist(ballWidth)
-    point.z = angle
-    pub_dist.publish(point)
+        yAngle = ((cY - int(h/2))/h)*0.8517
+        print(yAngle)
+
+    if yAngle < 0.32:
+        point = Point()
+        # point.x = calc_dist(ballWidth, h)
+        point.x = calc_dist(ballWidth)
+        point.z = angle
+        pub_dist.publish(point)
 
     # just displaying it
     length = int(w/100)
@@ -114,11 +127,11 @@ def image_callback(data):
     cv2.line(image, (startX, cY), (endX, cY), (0, 0, 255), 2)
     cv2.line(image, (cX, startY), (cX, endY), (0, 0, 255), 2)
 
-    image = imutils.resize(image, width=500)
-    mask = imutils.resize(mask, width=500)
-    cv2.imshow('image',image)
-    cv2.imshow('mask',mask)
-    cv2.waitKey(1)
+    # image = imutils.resize(image, width=500)
+    # mask = imutils.resize(mask, width=500)
+    # cv2.imshow('image',image)
+    # cv2.imshow('mask',mask)
+    # cv2.waitKey(1)
 
 
 def dist_callback(data):

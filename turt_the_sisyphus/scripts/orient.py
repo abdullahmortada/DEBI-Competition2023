@@ -1,49 +1,50 @@
 #!/usr/bin/env python3
 import rospy
 
-from std_msgs.msg import Float32
+from std_msgs.msg import Bool
 from geometry_msgs.msg import Twist
 from geometry_msgs.msg import Point
 
 # Callback function called whenever
 # x-y coordinate received
 def drive_callback(data):
-    ball_x 	= data.x
-    ball_y 	= data.y
-    width  	= data.z
+    if is_moving:
+        return 
 
-    # Create Twist() instance
     vel = Twist()
-
-    # 
-    if ball_x < 0 and ball_y < 0:
+    if data.x < 0:
         pass
     else:
         # Determine center-x, normalized deviation from center
-        mid_x  	= int(width/2)
-        delta_x	= ball_x - mid_x
-        norm_x 	= delta_x/width
 
-        if norm_x > 0.1:
-            print ("delX: {:.3f}. Turn right".format(norm_x))
+        if data.z > 0.09:
+            print ("angle: {:.3f}. Turn right".format(data.z))
             vel.angular.z = -0.5
-        elif norm_x < -0.1:
-            print ("delX: {:.3f}. Turn left".format(norm_x))
+        elif data.z < -0.09:
+            print ("angle: {:.3f}. Turn left".format(data.z))
             vel.angular.z = 0.5
-        if abs(norm_x) < 0.1:
-            print ("delX: {:.3f}. Stay in center".format(norm_x))
+        if abs(data.z) < 0.09:
+            print ("angle: {:.3f}. Stay in center".format(data.z))
     # publish vel on the publisher
     pub_vel.publish(vel)
 
 
+def moving_callback(data):
+    global is_moving 
+    is_moving = data.data
+
+
 if __name__ == '__main__':
-    global pub_vel
+    global pub_vel, is_moving
+
+    is_moving = False
 
     # intialize the node
-    rospy.init_node('drive_wheel', anonymous=True)
+    rospy.init_node('orient', anonymous=True)
 
     # subscribe to /ball_location topic to receive coordinates
-    img_sub = rospy.Subscriber("/ball_location",Point, drive_callback)
+    img_sub = rospy.Subscriber("/ball_dist",Point, drive_callback)
+    move_sub = rospy.Subscriber("/is_moving",Bool, moving_callback)
 
     # publish to /cmd_vel topic the angular-z velocity change
     pub_vel = rospy.Publisher('/cmd_vel', Twist, queue_size=5)
