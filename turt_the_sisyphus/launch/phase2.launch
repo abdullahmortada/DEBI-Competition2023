@@ -1,0 +1,6 @@
+<launch>
+  <include file="$(find turt_gazebo_test)/launch/debi_map.launch"></include>
+  <node name="movement_node" pkg="turt_the_sisyphus" type="movement.py" output="screen"/>
+  <node name="camera_node" pkg="turt_the_sisyphus" type="hough.py" output="screen"/>
+  <node name="orientation_node" pkg="turt_the_sisyphus" type="orient.py" output="screen"/>
+</launch>
