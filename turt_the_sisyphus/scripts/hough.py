@@ -14,7 +14,6 @@ Function for detecting the ball
 and returning its coordinate
 '''
 
-dist = lambda x1,y1,x2,y2: (x1-x2)**2+(y1-y2)**2
 
 def detectBall(frame):
     global counter, X, Y, cX, cY
@@ -76,12 +75,16 @@ def image_callback(data):
     pub_point.publish(point)	# Publish point on the publisher
 
     angle = -1
+    yAngle = -1
     if cX >= 0: 
         angle = ((cX - int(w/2))/w)*1.0856
-    point = Point()
-    point.x = calc_dist(ballWidth)
-    point.z = angle
-    pub_dist.publish(point)
+        yAngle = ((cY - int(h/2))/h)*0.8517
+
+    if yAngle < 0.32:
+        point = Point()
+        point.x = calc_dist(ballWidth)
+        point.z = angle
+        pub_dist.publish(point)
 
     # just displaying it
     length = int(w/100)
@@ -90,8 +93,8 @@ def image_callback(data):
     cv2.line(image, (startX, cY), (endX, cY), (0, 0, 255), 2)
     cv2.line(image, (cX, startY), (cX, endY), (0, 0, 255), 2)
 
-    image = imutils.resize(image, width=500)
-    mask = imutils.resize(mask, width=500)
+    # image = imutils.resize(image, width=500)
+    # mask = imutils.resize(mask, width=500)
     # cv2.imshow('image',image)
     # cv2.imshow('mask',mask)
     # cv2.waitKey(1)

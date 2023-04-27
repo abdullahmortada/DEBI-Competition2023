@@ -2,9 +2,9 @@
 import rospy
 import cv2
 from cv_bridge import CvBridge 
-import imutils
 from geometry_msgs.msg import Point
 from sensor_msgs.msg import CompressedImage
+# import imutils
 # from math import pi
 # from std_msgs.msg import Float32
 
@@ -13,7 +13,6 @@ Function for detecting the ball
 and returning its coordinate
 '''
 
-dist = lambda x1,y1,x2,y2: (x1-x2)**2+(y1-y2)**2
 
 def detectBall(frame):
     global counter, X, Y, cX, cY
@@ -116,7 +115,6 @@ def image_callback(data):
 
     if yAngle < 0.32:
         point = Point()
-        # point.x = calc_dist(ballWidth, h)
         point.x = calc_dist(ballWidth)
         point.z = angle
         pub_dist.publish(point)
