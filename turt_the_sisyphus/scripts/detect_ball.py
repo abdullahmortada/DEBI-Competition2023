@@ -3,7 +3,6 @@ import rospy
 import cv2
 from cv_bridge import CvBridge 
 import imutils
-
 from geometry_msgs.msg import Point
 from sensor_msgs.msg import CompressedImage
 # from math import pi
@@ -13,6 +12,8 @@ from sensor_msgs.msg import CompressedImage
 Function for detecting the ball 
 and returning its coordinate
 '''
+
+dist = lambda x1,y1,x2,y2: (x1-x2)**2+(y1-y2)**2
 
 def detectBall(frame):
     global counter, X, Y, cX, cY
@@ -24,14 +25,14 @@ def detectBall(frame):
     i1, i2 = 1, 1
 
     # blue
-    # colorLower = ( 90, 70,100)
+    # colorLower = ( 90, 70,70)
     # colorUpper = (120,200,255)
     # i1, i2 = 0, 5
 
-    # #orange
-    # colorLower = (  0, 75,145)
-    # colorUpper = ( 50,255,255)
-    # i1, i2 = 3, 5
+    # red
+    colorLower = (  0, 50,50)
+    colorUpper = ( 35,255,255)
+    i1, i2 = 3, 5
 
     # Convert to HSV color-space and create the mask
     hsv  = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
